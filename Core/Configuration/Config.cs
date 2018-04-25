@@ -66,6 +66,7 @@ namespace JiraIntegration.Core.Configuration
 
         public string JiraAddress { get; private set; }
 
+        [JsonProperty(nameof(Password))]
         public string EncryptedPassword { get; private set; }
 
 
@@ -79,6 +80,21 @@ namespace JiraIntegration.Core.Configuration
         {
             var value = File.ReadAllText(file);
             return JsonConvert.DeserializeObject<Config>(value);
+        }
+
+        public static Config ReadAndSaveAsEncrypted(string file)
+        {
+            var config = Read(file);
+            if (config._encrypter.IsEncrypted(config.EncryptedPassword))
+                return config;
+
+            config.EncryptedPassword = config._encrypter.Encrypt(
+                config.EncryptedPassword,
+                config.Username + config.JiraAddress);
+
+            config.Save(file);
+
+            return config;
         }
 
         public static Config WithUnencryptedPassword(string jiraAddress, string username, string unencryptedPassword)
