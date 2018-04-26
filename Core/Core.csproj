@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JiraIntegration.Core</RootNamespace>
-    <AssemblyName>JiraIntegration.Core</AssemblyName>
+    <AssemblyName>Core</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -51,8 +51,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Encrypter.cs" />
-    <Compile Include="Common\IEncrypter.cs" />
-    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Common\Exceptions.cs" />
+    <Compile Include="Configuration\AuthConfig.cs" />
+    <Compile Include="Configuration\ConfigClient.cs" />
+    <Compile Include="Configuration\Settings.cs" />
+    <Compile Include="Constants\AcConst.cs" />
+    <Compile Include="Constants\ConfigConst.cs" />
+    <Compile Include="Entities\AcIssue.cs" />
+    <Compile Include="Entities\JiraIssue.cs" />
     <Compile Include="JiraClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

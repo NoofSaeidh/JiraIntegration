@@ -14,9 +14,10 @@ namespace JiraIntegration.Cli
     {
         static void Main(string[] args)
         {
-            using (var config = Config.ReadAndSaveAsEncrypted(@"Creds.json"))
+            using (var configClient = new ConfigClient(AppDomain.CurrentDomain.BaseDirectory))
             {
-                var jira = new JiraClient(config);
+                configClient.ReadConfigs();
+                var jira = new JiraClient(configClient);
 
                 jira.Test();
             }

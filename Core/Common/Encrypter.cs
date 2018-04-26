@@ -11,6 +11,13 @@ using System.Threading.Tasks;
 
 namespace JiraIntegration.Core.Common
 {
+    public interface IEncrypter
+    {
+        string Encrypt(string text);
+        string Decrypt(string encryptedTest);
+        bool IsEncrypted(string text);
+    }
+
     public class Encrypter : IEncrypter
     {
         private readonly SecureString _password;

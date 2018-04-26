@@ -12,17 +12,21 @@ namespace JiraIntegration.Core
 {
     public class JiraClient
     {
-        private readonly IConfig _config;
-
-        public JiraClient(IConfig config)
+        private readonly ConfigClient _configClient;
+        private IAuthConfig _authConfig => _configClient.AuthConfig;
+        private Settings _settings => _configClient.Settings;
+        private readonly Jira _client;
+        public JiraClient(ConfigClient configClient)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _configClient = configClient ?? throw new ArgumentNullException(nameof(configClient));
+            _configClient.CheckInitialization();
+            _client = Jira.CreateRestClient(_authConfig.JiraAddress, _authConfig.Username, _authConfig.Password);
         }
 
         public void Test()
         {
-            var jira = Jira.CreateRestClient(_config.JiraAddress, _config.Username, _config.Password);
-
+            var tmp = _client.Issues.GetIssueAsync("AC-104862").Result;
+            var relations = tmp.GetIssueLinksAsync().Result;
         }
     }
 }

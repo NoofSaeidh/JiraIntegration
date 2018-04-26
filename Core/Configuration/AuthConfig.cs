@@ -11,21 +11,21 @@ using System.Threading.Tasks;
 
 namespace JiraIntegration.Core.Configuration
 {
-    public interface IConfig
+    public interface IAuthConfig
     {
         string Password { get; }
         string Username { get; }
         string JiraAddress { get; }
     }
 
-    public class Config : IConfig, IDisposable
+    public class AuthConfig : IAuthConfig, IDisposable
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Encrypter _encrypter;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly SecureString _encryterSecureString;
 
-        protected Config()
+        protected AuthConfig()
         {
             _encryterSecureString = new SecureString();
             _encryterSecureString.AppendChar((char)80); // P
@@ -42,7 +42,7 @@ namespace JiraIntegration.Core.Configuration
         }
 
         [JsonConstructor]
-        public Config(string username, string jiraAddress, string encryptedPassword) : this()
+        public AuthConfig(string username, string jiraAddress, string encryptedPassword) : this()
         {
             Username = username ?? throw new ArgumentNullException(nameof(username));
             JiraAddress = jiraAddress ?? throw new ArgumentNullException(nameof(jiraAddress));
@@ -69,20 +69,19 @@ namespace JiraIntegration.Core.Configuration
         [JsonProperty(nameof(Password))]
         public string EncryptedPassword { get; private set; }
 
-
         public void Save(string file)
         {
             var value = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(file, value);
         }
 
-        public static Config Read(string file)
+        public static AuthConfig Read(string file)
         {
             var value = File.ReadAllText(file);
-            return JsonConvert.DeserializeObject<Config>(value);
+            return JsonConvert.DeserializeObject<AuthConfig>(value);
         }
 
-        public static Config ReadAndSaveAsEncrypted(string file)
+        public static AuthConfig ReadAndSaveAsEncrypted(string file)
         {
             var config = Read(file);
             if (config._encrypter.IsEncrypted(config.EncryptedPassword))
@@ -97,9 +96,9 @@ namespace JiraIntegration.Core.Configuration
             return config;
         }
 
-        public static Config WithUnencryptedPassword(string jiraAddress, string username, string unencryptedPassword)
+        public static AuthConfig WithUnencryptedPassword(string jiraAddress, string username, string unencryptedPassword)
         {
-            var config = new Config
+            var config = new AuthConfig
             {
                 JiraAddress = jiraAddress ?? throw new ArgumentNullException(nameof(jiraAddress)),
                 Username = username ?? throw new ArgumentNullException(nameof(username)),
