@@ -1,6 +1,7 @@
 ﻿using Atlassian.Jira;
 using Atlassian.Jira.Linq;
 using JiraIntegration.Core.Configuration;
+using JiraIntegration.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,21 +13,50 @@ namespace JiraIntegration.Core
 {
     public class JiraClient
     {
-        private readonly ConfigClient _configClient;
-        private IAuthConfig _authConfig => _configClient.AuthConfig;
-        private Settings _settings => _configClient.Settings;
+        private readonly Configurer _configurer;
+        private IAuthConfig _authConfig => _configurer.AuthConfig;
+        private Settings _settings => _configurer.Settings;
         private readonly Jira _client;
-        public JiraClient(ConfigClient configClient)
+        public JiraClient(Configurer configurer)
         {
-            _configClient = configClient ?? throw new ArgumentNullException(nameof(configClient));
-            _configClient.CheckInitialization();
+            _configurer = configurer ?? throw new ArgumentNullException(nameof(configurer));
+            _configurer.CheckInitialization();
             _client = Jira.CreateRestClient(_authConfig.JiraAddress, _authConfig.Username, _authConfig.Password);
         }
 
-        public void Test()
+        public async Task<JiraIssue> GetIssue(string key)
         {
-            var tmp = _client.Issues.GetIssueAsync("AC-104862").Result;
-            var relations = tmp.GetIssueLinksAsync().Result;
+            return new JiraIssue(await _client.Issues.GetIssueAsync(key));
+        }
+
+        public void AddToFavorites(JiraIssue issue)
+        {
+            if (issue == null)
+                throw new ArgumentNullException(nameof(issue));
+
+            var pi = (PersistentIssue)issue;
+            if (!_settings.Favorites.Contains(pi))
+                _settings.Favorites.Add(pi);
+            _configurer.SaveConfigs();
+        }
+
+        public void AddToFavorites(string issueKey)
+        {
+            if (issueKey == null)
+                throw new ArgumentNullException(nameof(issueKey));
+
+            if (!_settings.Favorites.Contains(issueKey))
+                _settings.Favorites.Add(issueKey);
+            _configurer.SaveConfigs();
+        }
+
+        public async Task<IEnumerable<JiraIssue>> GetFavorites()
+        {
+            return (await _client
+                .Issues
+                .GetIssuesAsync(_settings.Favorites.Select(x => (string)x)))
+                .Values
+                .ToJiraIssues();
         }
     }
 }

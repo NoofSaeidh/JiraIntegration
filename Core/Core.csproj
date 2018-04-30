@@ -55,13 +55,21 @@
     <Compile Include="Common\Encrypter.cs" />
     <Compile Include="Common\Exceptions.cs" />
     <Compile Include="Configuration\AuthConfig.cs" />
-    <Compile Include="Configuration\ConfigClient.cs" />
+    <Compile Include="Configuration\Configurer.cs" />
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="Constants\AcConst.cs" />
     <Compile Include="Constants\ConfigConst.cs" />
     <Compile Include="Entities\AcIssue.cs" />
+    <Compile Include="Entities\IJiraIssue.cs" />
     <Compile Include="Entities\JiraIssue.cs" />
+    <Compile Include="Entities\JiraIssueExtensions.cs" />
+    <Compile Include="Entities\PersistentIssue.cs" />
     <Compile Include="JiraClient.cs" />
+    <Compile Include="Serialization\DisplayClassAttribute.cs" />
+    <Compile Include="Serialization\DisplayPropertyAttribute.cs" />
+    <Compile Include="Serialization\Enums.cs" />
+    <Compile Include="Serialization\DisplaySerializer.cs" />
+    <Compile Include="Serialization\ToStringJsonConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

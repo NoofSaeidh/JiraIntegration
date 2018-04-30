@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace JiraIntegration.Core.Configuration
 {
-    public class ConfigClient : IDisposable
+    public class Configurer : IDisposable
     {
         public const string AuthConfigFileName = ConfigConst.AuthConfigFile;
         public const string SettingsFileName = ConfigConst.SettingsFile;
 
-        public ConfigClient(string configsFolder)
+        public Configurer(string configsFolder)
         {
             ConfigsFolder = configsFolder ?? throw new ArgumentNullException(nameof(configsFolder));
             if (!Directory.Exists(ConfigsFolder))
@@ -24,28 +24,31 @@ namespace JiraIntegration.Core.Configuration
 
         }
         public IAuthConfig AuthConfig { get; set; }
-        public Settings Settings { get; set; }
-
-        public string ConfigsFolder { get; }
         public string AuthConfigPath => Path.Combine(ConfigsFolder, AuthConfigFileName);
-        public string SettingsConfigPath => Path.Combine(ConfigsFolder, SettingsFileName);
+        public string ConfigsFolder { get; }
         public bool Initialized => AuthConfig != null && Settings != null;
-
+        public Settings Settings { get; set; }
+        public string SettingsConfigPath => Path.Combine(ConfigsFolder, SettingsFileName);
         public void CheckInitialization()
         {
             if (Initialized) return;
 
             if (AuthConfig == null)
-                throw new JiraIntegrationException($"{nameof(ConfigClient)} is not fully initialized. " +
+                throw new JiraIntegrationException($"{nameof(Configurer)} is not fully initialized. " +
                     $"{nameof(AuthConfig)} is null.");
 
             if (Settings == null)
             {
                 Settings = new Settings
                 {
-                    Favorites = new List<JiraIssue>()
+                    Favorites = new List<PersistentIssue>()
                 };
             }
+        }
+
+        void IDisposable.Dispose()
+        {
+            (AuthConfig as IDisposable)?.Dispose();
         }
 
         public virtual void ReadConfigs()
@@ -67,12 +70,6 @@ namespace JiraIntegration.Core.Configuration
                 SaveJson(SettingsConfigPath, Settings);
             }
         }
-
-        void IDisposable.Dispose()
-        {
-            (AuthConfig as IDisposable)?.Dispose();
-        }
-
         internal static T ReadJson<T>(string path) where T : class
         {
             if (!File.Exists(path))
@@ -85,7 +82,7 @@ namespace JiraIntegration.Core.Configuration
         {
             //todo: maybe should review this
             if (value == null) return;
-
+            
             File.WriteAllText(path, JsonConvert.SerializeObject(value, Formatting.Indented));
         }
     }

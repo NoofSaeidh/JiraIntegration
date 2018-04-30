@@ -10,6 +10,8 @@ namespace JiraIntegration.Core.Entities
 {
     public class AcIssue : JiraIssue
     {
+        public const string RelatedProject = "AC";
+
         public AcIssue(Issue issue) : base(issue)
         {
 
@@ -20,19 +22,13 @@ namespace JiraIntegration.Core.Entities
 
         }
 
+        public string QaVerifier { get; set; }
+
         protected override void FillFromIssue(Issue issue)
         {
             if (issue == null) return;
             base.FillFromIssue(issue);
             QaVerifier = issue[AcConst.CustomFields.QaVerifier]?.Value;
         }
-
-        public override string Project
-        {
-            get => AcConst.AcProject;
-            set {  }
-        }
-
-        public virtual string QaVerifier { get; set; }
     }
 }

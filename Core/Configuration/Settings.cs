@@ -9,6 +9,6 @@ namespace JiraIntegration.Core.Configuration
 {
     public class Settings
     {
-        public ICollection<JiraIssue> Favorites { get; set; }
+        public ICollection<PersistentIssue> Favorites { get; set; }
     }
 }
